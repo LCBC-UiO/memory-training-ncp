@@ -1,4 +1,4 @@
-boot_sampfun <- function(fitted, data, response, individual_residuals = TRUE) {
+boot_sampfun <- function(fitted, data, response, boot_type = "case-ir") {
   dd <- data %>%
     mutate(
       pred = as.numeric(predict(fitted, levels = 1)),
@@ -14,14 +14,15 @@ boot_sampfun <- function(fitted, data, response, individual_residuals = TRUE) {
   }, .id = "boot_id")
   
   ## if TRUE, within groups, sample *residuals* with replacement
-  if(individual_residuals){
+  if(boot_type == "case-ir"){
     bootdat <- bootdat %>% 
       group_by(boot_id)
   }
   
   bootdat %>% 
     mutate(
-      !!response := pred + sample(res, size = n(), replace = TRUE)
+      !!response := pred + if_else(
+        !!boot_type == "case-none", res, sample(res, size = n(), replace = TRUE))
     ) %>% 
     ungroup()
 }
