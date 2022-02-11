@@ -263,7 +263,7 @@ if(params$rerun_bootstrap){
   bootgrid <- future_map_dfr(seq_len(nresamp), function(i){
     # Fit updated models on bootstrapped datasets
     response <- "hwt_z"
-    upmod <- update(mod, data = boot_sampfun(mod, memdat_long, "hwt_z"))
+    upmod <- update(mod, data = boot_sampfun(mod, memdat_long, "hwt_z", TRUE))
     grids$grid %>%
       mutate(
         fit0 = boot_predfun(upmod, grids$grid0),
@@ -279,6 +279,8 @@ if(params$rerun_bootstrap){
 }
 
 ```
+
+By default, the `boot_sampfun` function first bootstraps the individuals, and then bootstraps the residuals within individuals. We can however bootstrap all residuals, that is, a case bootstrap coupled with global residual bootstrap, by setting its fourth argument to `individual_residuals = FALSE`. The results obtained with this approach were indistinguishable.
 
 The plots below show the estimated temporal extent of the training in each age group. It is assumed that a single training session has been completed at time zero, and the development of the expected level is plotted with the solid black lines with green shaded areas representing 95 % confidence intervals. The solid black lines at the bottom represent the reference level with no training, with red shaded areas corresponding to 95 % confidence intervals. The plots here are shown for Females, but Males would have identical curves except for a vertical shift along the y-axis.
 
